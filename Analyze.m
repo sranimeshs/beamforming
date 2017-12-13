@@ -27,6 +27,7 @@ end
 
 % Compute delays and generate shifted combined audio
 samples = dir(sprintf('%s/sample*.wav', sample_fold));
+delay_info = [];
 for i=1:1:length(samples)
     audio_file = sprintf('%s/sample%d.wav', sample_fold, i);
     left_fname = sprintf('left/left%d.wav', i);
@@ -39,6 +40,11 @@ for i=1:1:length(samples)
     [~,I] = max(abs(xc));
     lagDiff = lags(I);
     
+    if length(delay_info) == 0
+        delay_info = lagDiff;
+    else
+        delay_info = [delay_info; lagDiff];
+    end
     fprintf('Delay found (sample data point): %s\n', num2str(lagDiff))
     
     [left, ~] = audioread(left_fname);
@@ -53,6 +59,20 @@ for i=1:1:length(samples)
     end
     
     comb_data = (left + right)/2;
+    audiowrite(comb_fname, comb_data, fs);
+end
+
+fprintf('Delay info written to delay.csv.\n')
+csvwrite('delay.csv', delay_info);
+
+fprintf('Generating merged false audios.\n')
+false_files = dir(sprintf('false_samples/false*.wav'));
+for i=1:1:length(false_files)
+    audio_file = sprintf('false_samples/%s', false_files(i).name);
+    [data,fs] = audioread(audio_file);
+    comb_data = (data(:,1) + data(:,2))/2;
+    
+    comb_fname = sprintf('false_combined/%s', false_files(i).name);
     audiowrite(comb_fname, comb_data, fs);
 end
 
