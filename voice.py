@@ -66,8 +66,7 @@ def wavefile_generator(filename):
 @click.option('--sensitivity', type=float, help="Sensitivity of hotword detector to be used", default=0.6)
 def hotword_accuracy(data, labelfile, sensitivity):
     res = compute_hotword_accuracy(data, labelfile, sensitivity)
-    print(res)
-    print(sensitivity, res[0][1], res[1][1], res[2][1]) 
+    print('ACCURACY, %s, %s, %s, %s' % (sensitivity, res[0][1], res[1][1], res[2][1]))
 
 
 def compute_hotword_accuracy(data, labelfile, sensitivity):
